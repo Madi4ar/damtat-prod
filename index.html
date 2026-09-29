@@ -58,9 +58,7 @@
               Настроить
             </button>
           </div>
-          <p class="active-scenario">
-            Сейчас выбрано: <span id="activeScenarioLabel">Для себя</span>
-          </p>
+          <div class="active-filters" id="activeFilters"></div>
         </div>
       </section>
 
@@ -271,16 +269,15 @@
                   placeholder="например, 40" />
               </div>
 
-              <div class="field" data-field="cuisine">
-                <label for="cuisineSelect">Кухня</label>
-                <select id="cuisineSelect">
-                  <option value="any">Любая</option>
-                  <option value="kazakh">Казахская</option>
-                  <option value="asian">Азиатская</option>
-                  <option value="european">Европейская</option>
-                  <option value="italian">Итальянская</option>
-                  <option value="other">Домашняя</option>
-                </select>
+              <div class="field field-wide" data-field="cuisine">
+                <label>Кухня <span class="muted">(можно выбрать несколько)</span></label>
+                <div class="cuisine-chips">
+                  <label class="pref-chip"><input type="checkbox" class="cuisine-checkbox" value="kazakh"> Казахская</label>
+                  <label class="pref-chip"><input type="checkbox" class="cuisine-checkbox" value="asian"> Азиатская</label>
+                  <label class="pref-chip"><input type="checkbox" class="cuisine-checkbox" value="european"> Европейская</label>
+                  <label class="pref-chip"><input type="checkbox" class="cuisine-checkbox" value="italian"> Итальянская</label>
+                  <label class="pref-chip"><input type="checkbox" class="cuisine-checkbox" value="other"> Домашняя</label>
+                </div>
               </div>
 
               <div class="field field-wide" data-field="products">

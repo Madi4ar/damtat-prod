@@ -204,7 +204,7 @@ function recommend(scenario, params) {
   let pool = DISHES.filter((d) => d.category === 'main');
 
   if (params.time) pool = pool.filter((d) => d.time <= params.time);
-  if (params.cuisine && params.cuisine !== 'any') pool = pool.filter((d) => d.cuisine === params.cuisine);
+  if (params.cuisines && params.cuisines.length) pool = pool.filter((d) => params.cuisines.includes(d.cuisine));
   if (params.budget && params.people) {
     const perPerson = params.budget / params.people;
     pool = pool.filter((d) => costPerServing(d) <= perPerson * 1.15);
@@ -258,7 +258,7 @@ function buildWeekMenu(params) {
   let candidates = DISHES.filter((d) => d.category === 'main');
 
   if (params.time) candidates = candidates.filter((d) => d.time <= params.time);
-  if (params.cuisine && params.cuisine !== 'any') candidates = candidates.filter((d) => d.cuisine === params.cuisine);
+  if (params.cuisines && params.cuisines.length) candidates = candidates.filter((d) => params.cuisines.includes(d.cuisine));
   if (params.budget && params.people) {
     const perPerson = (params.budget / 5) / params.people;
     candidates = candidates.filter((d) => costPerServing(d) <= perPerson * 1.3);
@@ -288,12 +288,13 @@ function buildWeekMenu(params) {
 function buildFeast(params) {
   const guests = params.guests || 6;
   let mains = DISHES.filter((d) => d.category === 'main');
-  if (params.cuisine && params.cuisine !== 'any') mains = mains.filter((d) => d.cuisine === params.cuisine);
+  if (params.cuisines && params.cuisines.length) mains = mains.filter((d) => params.cuisines.includes(d.cuisine));
   if (params.time) mains = mains.filter((d) => d.time <= params.time);
   mains.sort((a, b) => b.servings - a.servings);
   const main = mains[0] || DISHES.find((d) => d.id === 'plov');
 
-  let cuisineFilter = params.cuisine && params.cuisine !== 'any' ? params.cuisine : main.cuisine;
+  // подбираем салат/закуску/десерт/напиток под кухню выбранного горячего
+  const cuisineFilter = main.cuisine;
   const pick = (cat) =>
     DISHES.find((d) => d.category === cat && d.cuisine === cuisineFilter) ||
     DISHES.find((d) => d.category === cat);
@@ -540,8 +541,8 @@ function readParams(scenario) {
   params.guests = Number(document.getElementById('guestsInput').value) || 6;
   params.budget = Number(document.getElementById('budgetInput').value) || null;
   params.time = Number(document.getElementById('timeInput').value) || null;
-  params.cuisine = document.getElementById('cuisineSelect').value;
-  params.prefs = Array.from(document.querySelectorAll('.pref-chip input:checked')).map((c) => c.value);
+  params.cuisines = Array.from(document.querySelectorAll('.cuisine-checkbox:checked')).map((c) => c.value);
+  params.prefs = Array.from(document.querySelectorAll('.pref-chips input:checked')).map((c) => c.value);
   params.products = productTags.slice();
   return params;
 }
@@ -561,6 +562,7 @@ function renderProductTags() {
       renderProductTags();
     });
   });
+  renderActiveFilters();
 }
 
 const LOADING_MESSAGES = [
@@ -616,13 +618,46 @@ const SCENARIO_SHORT_LABELS = {
   week: 'На неделю',
 };
 
+const PREF_LABELS = {
+  quick: 'Быстро',
+  budget: 'Бюджетно',
+  protein: 'Высокобелковое',
+  lowcal: 'Низкокалорийное',
+  family: 'Семейное',
+};
+
+// Собирает чипы под кнопкой «Готовить»: текущий сценарий + все выбранные
+// фильтры (кухни, предпочтения, бюджет, время, продукты).
+function renderActiveFilters() {
+  const el = document.getElementById('activeFilters');
+  const chips = [`<span class="filter-chip filter-chip--scenario">${SCENARIO_SHORT_LABELS[currentScenario] || currentScenario}</span>`];
+
+  document.querySelectorAll('.cuisine-checkbox:checked').forEach((c) => {
+    chips.push(`<span class="filter-chip">${CUISINE_LABELS[c.value] || c.value}</span>`);
+  });
+
+  document.querySelectorAll('.pref-chips input:checked').forEach((c) => {
+    chips.push(`<span class="filter-chip">${PREF_LABELS[c.value] || c.value}</span>`);
+  });
+
+  const budget = document.getElementById('budgetInput').value;
+  if (budget) chips.push(`<span class="filter-chip">До ${Number(budget).toLocaleString('ru-RU')} ₸</span>`);
+
+  const time = document.getElementById('timeInput').value;
+  if (time) chips.push(`<span class="filter-chip">До ${time} мин</span>`);
+
+  if (productTags.length) chips.push(`<span class="filter-chip">Продукты: ${productTags.length}</span>`);
+
+  el.innerHTML = chips.join('');
+}
+
 function chooseScenario(scenario) {
   currentScenario = scenario;
   document.querySelectorAll('.scenario-btn, .drawer-mood-btn').forEach((el) => {
     el.classList.toggle('active', el.dataset.scenario === scenario);
   });
   renderScenarioForm(scenario);
-  document.getElementById('activeScenarioLabel').textContent = SCENARIO_SHORT_LABELS[scenario] || scenario;
+  renderActiveFilters();
 }
 
 function openDrawer() {
@@ -684,6 +719,13 @@ function init() {
     generateAndShow(true);
     closeDrawer();
   });
+
+  // живое обновление чипов активных фильтров под кнопкой «Готовить»
+  document.querySelectorAll('.cuisine-checkbox, .pref-chips input').forEach((input) => {
+    input.addEventListener('change', renderActiveFilters);
+  });
+  document.getElementById('budgetInput').addEventListener('input', renderActiveFilters);
+  document.getElementById('timeInput').addEventListener('input', renderActiveFilters);
 
   const productInput = document.getElementById('productInput');
   productInput.addEventListener('keydown', (e) => {
