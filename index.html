@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DamTat — что приготовить сегодня</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="logo">
+          <img src="images/logo.svg" alt="DamTat" class="logo-mark" />
+          <span class="logo-text">DamTat</span>
+        </div>
+        <p class="tagline">- персональный помощник по готовке</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-blob" aria-hidden="true">
+          <span class="floatie floatie-1">🍅</span>
+          <span class="floatie floatie-2">🌿</span>
+          <span class="floatie floatie-3">🧄</span>
+          <span class="floatie floatie-4">🌶️</span>
+        </div>
+        <div class="hero-content">
+          <span class="sparkle">✦</span>
+          <h1>Что приготовим сегодня?</h1>
+          <p class="hero-sub">
+            Не ищи рецепт — скажи, что тебе нужно, и мы поможем решить, что
+            приготовить.
+          </p>
+          <div class="hero-actions">
+            <button
+              type="button"
+              id="generateBtn"
+              class="btn btn-primary btn-hero">
+              🍳 Готовить
+            </button>
+            <button type="button" id="openDrawerBtn" class="btn-pill">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <circle cx="9" cy="6" r="2.2" fill="currentColor" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <circle cx="15" cy="12" r="2.2" fill="currentColor" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+                <circle cx="11" cy="18" r="2.2" fill="currentColor" />
+              </svg>
+              Настроить
+            </button>
+          </div>
+          <p class="active-scenario">
+            Сейчас выбрано: <span id="activeScenarioLabel">Для себя</span>
+          </p>
+        </div>
+      </section>
+
+      <section id="scenarios" class="scenarios-section">
+        <div class="featured-row">
+          <button
+            class="scenario-btn scenario-btn--featured tint-peach"
+            data-scenario="today">
+            <span class="scenario-avatar">🍽</span>
+            <span class="scenario-text">
+              <span class="scenario-title"
+                >Для себя <span class="chevron">›</span></span
+              >
+              <span class="scenario-sub">Персональный подбор на сегодня</span>
+            </span>
+          </button>
+          <button
+            class="scenario-btn scenario-btn--featured tint-green"
+            data-scenario="guests">
+            <span class="scenario-avatar">🎉</span>
+            <span class="scenario-text">
+              <span class="scenario-title"
+                >На гостей <span class="chevron">›</span></span
+              >
+              <span class="scenario-sub">Полный стол за пару кликов</span>
+            </span>
+          </button>
+          <button
+            class="scenario-btn scenario-btn--featured tint-amber"
+            data-scenario="home">
+            <span class="scenario-avatar">🥕</span>
+            <span class="scenario-text">
+              <span class="scenario-title"
+                >Из дома <span class="chevron">›</span></span
+              >
+              <span class="scenario-sub">Из того, что уже есть на кухне</span>
+            </span>
+          </button>
+        </div>
+
+        <h2 class="section-heading">Выберите сценарий</h2>
+
+        <div class="mood-row">
+          <button
+            class="scenario-btn scenario-btn--compact"
+            data-scenario="new">
+            <span class="scenario-avatar scenario-avatar--sm tint-peach"
+              >✨</span
+            >
+            <span class="scenario-text">
+              <span class="scenario-title">Новое</span>
+              <span class="scenario-sub">Ещё не готовили</span>
+            </span>
+          </button>
+          <button
+            class="scenario-btn scenario-btn--compact"
+            data-scenario="quick">
+            <span class="scenario-avatar scenario-avatar--sm tint-amber"
+              >⚡</span
+            >
+            <span class="scenario-text">
+              <span class="scenario-title">Быстро</span>
+              <span class="scenario-sub">До 30 минут</span>
+            </span>
+          </button>
+          <button
+            class="scenario-btn scenario-btn--compact"
+            data-scenario="week">
+            <span class="scenario-avatar scenario-avatar--sm tint-green"
+              >📅</span
+            >
+            <span class="scenario-text">
+              <span class="scenario-title">На неделю</span>
+              <span class="scenario-sub">Меню на 5 дней</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section id="resultsSection" class="results-section" hidden>
+        <h2>Подборка для вас</h2>
+        <div id="results"></div>
+      </section>
+
+      <section class="feature-row">
+        <div class="feature-card tint-peach">
+          <div class="feature-head">
+            <span class="scenario-avatar">📊</span>
+            <span class="scenario-text">
+              <span class="scenario-title">Моя кухня</span>
+              <span class="scenario-sub">Статистика за этот месяц</span>
+            </span>
+          </div>
+          <div id="statsPanel" class="stats-panel"></div>
+        </div>
+
+        <div class="feature-card tint-green">
+          <div class="feature-head">
+            <span class="scenario-avatar">🕘</span>
+            <span class="scenario-text">
+              <span class="scenario-title">История</span>
+              <span class="scenario-sub">Недавно приготовленное</span>
+            </span>
+            <button id="clearHistoryBtn" class="btn-link">очистить</button>
+          </div>
+          <div id="historyList" class="history-panel"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          CookMate MVP — демонстрационная версия концепции персонального
+          помощника по готовке.
+        </p>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="drawerOverlay" class="drawer-overlay" hidden></div>
+    <aside id="settingsDrawer" class="settings-drawer" aria-hidden="true">
+      <div class="drawer-header">
+        <h2>Настроить подбор</h2>
+        <button
+          type="button"
+          id="closeDrawerBtn"
+          class="drawer-close"
+          aria-label="Закрыть">
+          ✕
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-moods">
+          <span class="drawer-label">Настроение</span>
+          <div class="drawer-mood-grid">
+            <button type="button" class="drawer-mood-btn" data-scenario="today">
+              <span class="scenario-avatar scenario-avatar--sm tint-peach"
+                >🍽</span
+              ><span>Сегодня</span>
+            </button>
+            <button
+              type="button"
+              class="drawer-mood-btn"
+              data-scenario="guests">
+              <span class="scenario-avatar scenario-avatar--sm tint-green"
+                >🎉</span
+              ><span>Гости</span>
+            </button>
+            <button type="button" class="drawer-mood-btn" data-scenario="home">
+              <span class="scenario-avatar scenario-avatar--sm tint-amber"
+                >🥕</span
+              ><span>Из дома</span>
+            </button>
+            <button type="button" class="drawer-mood-btn" data-scenario="new">
+              <span class="scenario-avatar scenario-avatar--sm tint-peach"
+                >✨</span
+              ><span>Новое</span>
+            </button>
+            <button type="button" class="drawer-mood-btn" data-scenario="quick">
+              <span class="scenario-avatar scenario-avatar--sm tint-amber"
+                >⚡</span
+              ><span>Быстро</span>
+            </button>
+            <button type="button" class="drawer-mood-btn" data-scenario="week">
+              <span class="scenario-avatar scenario-avatar--sm tint-green"
+                >📅</span
+              ><span>Неделя</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="filterPanel" class="filter-panel filter-panel--drawer">
+          <h3 id="formTitle">Что приготовить сегодня</h3>
+          <p id="formHint" class="muted"></p>
+
+          <form id="filterForm">
+            <div class="field-grid">
+              <div class="field" data-field="people">
+                <label for="peopleInput">Количество человек</label>
+                <input type="number" id="peopleInput" min="1" value="2" />
+              </div>
+
+              <div class="field" data-field="guests">
+                <label for="guestsInput">Количество гостей</label>
+                <input type="number" id="guestsInput" min="1" value="6" />
+              </div>
+
+              <div class="field" data-field="budget">
+                <label for="budgetInput">Бюджет, ₸</label>
+                <input
+                  type="number"
+                  id="budgetInput"
+                  min="0"
+                  step="500"
+                  placeholder="например, 10000" />
+              </div>
+
+              <div class="field" data-field="time">
+                <label for="timeInput">Максимум времени, мин</label>
+                <input
+                  type="number"
+                  id="timeInput"
+                  min="5"
+                  step="5"
+                  placeholder="например, 40" />
+              </div>
+
+              <div class="field" data-field="cuisine">
+                <label for="cuisineSelect">Кухня</label>
+                <select id="cuisineSelect">
+                  <option value="any">Любая</option>
+                  <option value="kazakh">Казахская</option>
+                  <option value="asian">Азиатская</option>
+                  <option value="european">Европейская</option>
+                  <option value="italian">Итальянская</option>
+                  <option value="other">Домашняя</option>
+                </select>
+              </div>
+
+              <div class="field field-wide" data-field="products">
+                <label for="productInput">Продукты, которые есть дома</label>
+                <div class="quick-products">
+                  <button
+                    type="button"
+                    class="quick-product"
+                    data-product="картофель">
+                    + картофель
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-product"
+                    data-product="яйца">
+                    + яйца
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-product"
+                    data-product="сыр">
+                    + сыр
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-product"
+                    data-product="курица">
+                    + курица
+                  </button>
+                  <button
+                    type="button"
+                    class="quick-product"
+                    data-product="помидоры">
+                    + помидоры
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  id="productInput"
+                  placeholder="введите продукт и нажмите Enter" />
+                <div id="productTags" class="tag-list"></div>
+              </div>
+
+              <div class="field field-wide" data-field="prefs">
+                <label>Предпочтения</label>
+                <div class="pref-chips">
+                  <label class="pref-chip"
+                    ><input type="checkbox" value="quick" /> Быстро</label
+                  >
+                  <label class="pref-chip"
+                    ><input type="checkbox" value="budget" /> Бюджетно</label
+                  >
+                  <label class="pref-chip"
+                    ><input type="checkbox" value="protein" />
+                    Высокобелковое</label
+                  >
+                  <label class="pref-chip"
+                    ><input type="checkbox" value="lowcal" />
+                    Низкокалорийное</label
+                  >
+                  <label class="pref-chip"
+                    ><input type="checkbox" value="family" /> Семейное</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              Подобрать
+            </button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
